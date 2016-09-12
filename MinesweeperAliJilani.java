@@ -7,7 +7,9 @@ MineSweeper by AJ Studios
    import java.awt.event.*;
    import javax.swing.*;
    import javax.swing.ImageIcon;
-   import java.util.Random; 
+   import java.util.Random;
+   import java.util.Stack;
+   import java.awt.Point;  
 
     public class MinesweeperAliJilani extends JFrame implements ActionListener
    {
@@ -19,11 +21,14 @@ MineSweeper by AJ Studios
       JButton temp;
       Random rand = new Random();
       Random rand2 = new Random();
-      JFrame frame = new JFrame("gg");//Game over screen when user clicks on a mine
+      JFrame frame = new JFrame();//Game over screen when user clicks on a mine
       Font ggFont = new Font("Dialog", Font.PLAIN, 100);
       int mineClicked; //int to help keep track of which mine is clicked
       int mineClicked2; // '' ''
-      ImageIcon mine = new ImageIcon("mine.png"); // Import a 'mine' image
+      ImageIcon mine = new ImageIcon("Mina.png"); // Import a 'mine' image
+      Point punto=new Point() ;
+      Stack<Object> pila = new Stack<Object>();
+       
    	
    
    
@@ -46,13 +51,12 @@ MineSweeper by AJ Studios
                boxNotClicked[i][j].setActionCommand( boxLocation );   // set the  command so when the button is clicked it switches with
                boxNotClicked[i][j].addActionListener( this );
                boxNotClicked[i][j].setVisible( true );
-            
                boxClicked[i][j] = new JButton("Click");
                boxClicked[i][j].setPreferredSize(new Dimension(50, 50));
                boxClicked[i][j].setVisible( true );
              
                setLayout( new FlowLayout() ); //set the flow layout to properly lay the buttons on the screen
-                    
+               //add( boxNotClicked[i][j] );       
             
             }
          }
@@ -65,7 +69,7 @@ MineSweeper by AJ Studios
             }
          }
       	
-         JLabel gg = new JLabel("gg"); //The words for the gameover screen
+         JLabel gg = new JLabel("Mina"); //The words for the gameover screen
          gg.setVisible(true);
          gg.setFont(ggFont); //set the font for the gameover screen
          gg.setHorizontalAlignment(SwingConstants.CENTER); // center it in the frame
@@ -156,28 +160,93 @@ MineSweeper by AJ Studios
       
          setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );   
       }
+      public void abre(JButton b,int i, int j){
+         boxClicked[i][j] = new JButton("Click");
+         if (boxNumTracker[i][j] == 10){
+               boxClicked[i][j].setVisible( true );
+            }
+      }
+      public void mete(int i, int j){
+      double x,y;
+      x= (double)i; 
+      y=(double)j; 
+      punto = new Point(i,j);
+      pila.push(punto);
+   }
+   public Point saca(){
+      punto = new Point(); 
+       punto = (Point) pila.pop();
+   return punto;
+   }
+   public void recursion(int i , int j, int[][] a){
+      if(((i>=0)&&(j>=0))&&((i<10)&&(j<10))){
+         if (a[i][j]==0){
+            mete(i,j);
+            a[i][j]=10;
+            if(a[i][j]==10)boxNotClicked[x][y] = boxClicked[x][y]; 
+         }if(a[i-1][j-1]==0){
+                           mete(i-1,j-1);
+
+         }if(a[i-1][j]==0){
+                           mete(i-1,j);
+                           
+         }if (a[i-1][j+1]==0){
+                           mete(i-1,j+1);
+                           
+         }if (a[i][j+1]==0){
+                           mete(i,j+1);
+         }if(a[i+1][j+1]==0){
+                           mete(i+1,j+1);
+         }if(a[i+1][j]==0){
+                           mete(i+1,j);
+         }if(a[i+1][j-1]==0){
+                           mete(i+1,j-1);
+         }if(a[i][j-1]==0){
+                           mete(i,j-1);
+         }
+      }
+      Point guarda = new Point();
+      guarda=saca();
+      if(a[(int)guarda.getX()][(int)guarda.getY()]!=10){ 
+         recursion((int)guarda.getX(),(int)guarda.getY(),a);
+      }else if(!pila.isEmpty()){
+         recursion((int)guarda.getX(),(int)guarda.getY(),a);
+      }else{
+         return; 
+      }  
+         
+           
+   }
+
    
        public void actionPerformed( ActionEvent evt) //listen for a button to be clicked
       {
+         int i , j = 0;
          for(int x=0; x<9; x++)
          {
             for(int y=0; y<9; y++)
             {
+               //boxNotClicked[x][y] = boxClicked[x][y];
                String checkLocation = x + " " + y;
                if ( evt.getActionCommand().equals( checkLocation ) ) // finds the button the user clicked
                {
-               
+                  
+                  
                   boxNotClicked[x][y].setVisible(false);
-               
+                  //frame.setVisible(true);
                   if(boxNumTracker[x][y] == -1) // if the user clicked a mine, bring up the gg screen
                   {
+                     boxClicked[x][y].setVisible(true);
                      frame.setVisible(true);
+                     //recursion(x,y,boxNumTracker);
+                  evt.getActionCommand();
                   }
                
                   boxNotClicked[x][y] = boxClicked[x][y]; // otherwise switch that button with the 'valued button in the parrallel array
-               
+                  
                
                }
+               
             }
          
          }
@@ -194,7 +263,9 @@ MineSweeper by AJ Studios
             
                boxNotClicked[q][w].setVisible(true); //readd the button after changing it's value
                add ( boxNotClicked[q][w]);
-            				
+               //if (boxNumTracker[i][j] == 10){
+               //boxClicked[i][j].setVisible( true );
+               //}            				
             
             }
          }
